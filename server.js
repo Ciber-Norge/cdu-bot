@@ -34,7 +34,7 @@ co(function*(){
   });
   
   app.post('/slack', function(req, res){
-    var json = JSON.parse(req.body);
+    var json = req.body;
     
     const sentence = json.text.split(/\s+/);
     
