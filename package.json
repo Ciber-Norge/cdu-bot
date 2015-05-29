@@ -1,0 +1,22 @@
+{
+  "name": "cdu-bot",
+  "version": "0.0.0",
+  "description": "## TODO",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Ciber-Norge/cdu-bot.git"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/Ciber-Norge/cdu-bot/issues"
+  },
+  "dependencies": {
+    "node-slack": "0.0.7"
+  }
+}
