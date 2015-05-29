@@ -1,26 +1,60 @@
-var Slack = require('node-slack');
-var getSchedule = require('./getSchedule');
+const Slack = require('node-slack');
+const getSchedule = require('./getSchedule');
+const co = require('co');
+const express = require('express');
 
-var url = 'https://hooks.slack.com/services/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';
-
-
-var slack = new Slack(url);
-
+const url = process.env['SLACK_URL'];
 
 
+const slack = new Slack(url);
 
-getSchedule(function(error, schedule){
+
+
+co(function*(){
+  const schedule = yield getSchedule();
     
-  schedule.filter(function(talk){
-    return talk.date > new Date();
-  }).forEach(function(talk){
+  schedule
+  .filter(talk => talk.date > new Date())
+  .forEach(function(talk){
     
     setTimeout(function(){
       slack.send({
-          text: talk.time+': *'+talk.title+'* (_'+talk.speaker+'_)',
+          text: `${talk.time}: *${talk.title}* (_${talk.speaker}_)`,
           channel: '#general'
       });
     }, talk.date - new Date());
   });
   
+  const app = express();
+  
+  app.use(require('body-parser').urlencoded({extended:true}));
+  
+  app.get('/', function(req, res){
+    res.end('hello');
+  });
+  
+  app.post('/slack', function(req, res){
+    var json = JSON.parse(req.body);
+    
+    const sentence = json.text.split(/\s+/);
+    
+    const trigger = sentence.shift();
+    const keyword = sentence.shift();
+    
+    if(keyword == 'program'){
+        res.end(JSON.stringify({
+          text: schedule.map(talk => `${talk.time}: *${talk.title}* (_${talk.speaker}_)`).join('\n')
+        }));
+    }else{
+        res.end(JSON.stringify({
+          text: 'whut?'
+        }));
+    }
+    
+  });
+  
+  app.listen(8080);
 });
+
+
+process.on('SIGINT', () => process.exit());
